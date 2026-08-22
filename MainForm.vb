@@ -8,6 +8,10 @@ Imports Microsoft.Win32
 Public Class MainForm
     Inherits Form
 
+    ' ============================================================
+    ' CONTROLS
+    ' ============================================================
+
     Private ReadOnly warehouseCombo As New ComboBox()
     Private ReadOnly doorButtons(4) As Button
     Private ReadOnly statusLabel As New Label()
@@ -19,32 +23,20 @@ Public Class MainForm
     Private vlcPath As String = ""
 
     ' ============================================================
-    ' HIKVISION / DOOR SETTINGS
+    ' HIKVISION LOGIN
     ' ============================================================
 
     Private Const UserName As String = "admin"
 
     ' IMPORTANT:
-    ' Replace CHANGE_ME with your actual device password.
+    ' Change CHANGE_ME to your actual password.
     Private Const Password As String = "CHANGE_ME"
 
     ' ============================================================
-    ' CAMERA SETTINGS
+    ' CAMERA LIST
     ' ============================================================
 
-    Private ReadOnly cameras As New Dictionary(Of String, String) From {
-        {"WareHouse-7",
-         "rtsp://admin:CHANGE_ME@192.168.5.131:554/Streaming/Channels/101"},
-
-        {"WareHouse-9",
-         "rtsp://admin:CHANGE_ME@192.168.5.133:554/Streaming/Channels/101"},
-
-        {"WareHouse-4",
-         "rtsp://admin:CHANGE_ME@192.168.5.134:554/Streaming/Channels/101"},
-
-        {"WareHouse-5",
-         "rtsp://admin:CHANGE_ME@192.168.5.132:554/Streaming/Channels/101"}
-    }
+    Private ReadOnly cameras As New Dictionary(Of String, String)()
 
     ' ============================================================
     ' DOOR IP ADDRESSES
@@ -59,10 +51,12 @@ Public Class MainForm
     }
 
     ' ============================================================
-    ' FORM
+    ' CONSTRUCTOR
     ' ============================================================
 
     Public Sub New()
+
+        InitializeCameras()
 
         Text = "VOSTOK-WAREHOUSE"
 
@@ -83,28 +77,57 @@ Public Class MainForm
         ' --------------------------------------------------------
 
         Dim bgPath As String =
-            Path.Combine(Application.StartupPath, "background.jpg")
+            Path.Combine(
+                Application.StartupPath,
+                "background.jpg")
 
         If File.Exists(bgPath) Then
 
-            BackgroundImage = Image.FromFile(bgPath)
+            BackgroundImage =
+                Image.FromFile(bgPath)
 
-            BackgroundImageLayout = ImageLayout.Stretch
+            BackgroundImageLayout =
+                ImageLayout.Stretch
 
         End If
 
         ' --------------------------------------------------------
-        ' BUILD UI
+        ' BUILD FORM
         ' --------------------------------------------------------
 
         BuildInterface()
 
-        AddHandler Shown, AddressOf MainForm_Shown
+        AddHandler Shown,
+            AddressOf MainForm_Shown
 
     End Sub
 
     ' ============================================================
-    ' BUILD INTERFACE
+    ' INITIALIZE CAMERAS
+    ' ============================================================
+
+    Private Sub InitializeCameras()
+
+        cameras.Add(
+            "WareHouse-7",
+            "rtsp://admin:CHANGE_ME@192.168.5.131:554/Streaming/Channels/101")
+
+        cameras.Add(
+            "WareHouse-9",
+            "rtsp://admin:CHANGE_ME@192.168.5.133:554/Streaming/Channels/101")
+
+        cameras.Add(
+            "WareHouse-4",
+            "rtsp://admin:CHANGE_ME@192.168.5.134:554/Streaming/Channels/101")
+
+        cameras.Add(
+            "WareHouse-5",
+            "rtsp://admin:CHANGE_ME@192.168.5.132:554/Streaming/Channels/101")
+
+    End Sub
+
+    ' ============================================================
+    ' BUILD USER INTERFACE
     ' ============================================================
 
     Private Sub BuildInterface()
@@ -113,13 +136,24 @@ Public Class MainForm
         ' TITLE
         ' --------------------------------------------------------
 
-        Dim title As New Label With {
-            .Text = "VOSTOK-WAREHOUSE",
-            .Font = New Font("Segoe UI", 20, FontStyle.Bold),
-            .AutoSize = True,
-            .Location = New Point(28, 20),
-            .BackColor = Color.Transparent
-        }
+        Dim title As New Label()
+
+        title.Text =
+            "VOSTOK-WAREHOUSE"
+
+        title.Font =
+            New Font(
+                "Segoe UI",
+                20,
+                FontStyle.Bold)
+
+        title.AutoSize = True
+
+        title.Location =
+            New Point(28, 20)
+
+        title.BackColor =
+            Color.Transparent
 
         Controls.Add(title)
 
@@ -127,13 +161,24 @@ Public Class MainForm
         ' CAMERA LABEL
         ' --------------------------------------------------------
 
-        Dim cameraLabel As New Label With {
-            .Text = "Warehouse Camera",
-            .AutoSize = True,
-            .Font = New Font("Segoe UI", 10, FontStyle.Bold),
-            .Location = New Point(30, 82),
-            .BackColor = Color.Transparent
-        }
+        Dim cameraLabel As New Label()
+
+        cameraLabel.Text =
+            "Warehouse Camera"
+
+        cameraLabel.AutoSize = True
+
+        cameraLabel.Font =
+            New Font(
+                "Segoe UI",
+                10,
+                FontStyle.Bold)
+
+        cameraLabel.Location =
+            New Point(30, 82)
+
+        cameraLabel.BackColor =
+            Color.Transparent
 
         Controls.Add(cameraLabel)
 
@@ -150,15 +195,20 @@ Public Class MainForm
         warehouseCombo.Size =
             New Size(270, 30)
 
-        warehouseCombo.Items.AddRange(
-            New Object() {
-                "WareHouse-7",
-                "WareHouse-9",
-                "WareHouse-4",
-                "WareHouse-5"
-            })
+        warehouseCombo.Items.Add(
+            "WareHouse-7")
 
-        warehouseCombo.Enabled = False
+        warehouseCombo.Items.Add(
+            "WareHouse-9")
+
+        warehouseCombo.Items.Add(
+            "WareHouse-4")
+
+        warehouseCombo.Items.Add(
+            "WareHouse-5")
+
+        warehouseCombo.Enabled =
+            False
 
         AddHandler warehouseCombo.SelectedIndexChanged,
             AddressOf WarehouseCombo_SelectedIndexChanged
@@ -169,9 +219,11 @@ Public Class MainForm
         ' TALK BUTTON
         ' --------------------------------------------------------
 
-        talkButton.Text = "TALK"
+        talkButton.Text =
+            "TALK"
 
-        talkButton.Name = "TalkButton"
+        talkButton.Name =
+            "TalkButton"
 
         talkButton.Size =
             New Size(100, 30)
@@ -189,20 +241,23 @@ Public Class MainForm
             FlatStyle.Flat
 
         talkButton.Font =
-            New Font("Segoe UI", 9, FontStyle.Bold)
+            New Font(
+                "Segoe UI",
+                9,
+                FontStyle.Bold)
 
-        talkButton.FlatAppearance.BorderSize = 0
+        talkButton.FlatAppearance.BorderSize =
+            0
 
-        ' IMPORTANT:
-        ' MouseDown uses MouseEventArgs.
+        ' MouseDown
         AddHandler talkButton.MouseDown,
             AddressOf TalkButton_MouseDown
 
-        ' MouseUp uses MouseEventArgs.
+        ' MouseUp
         AddHandler talkButton.MouseUp,
             AddressOf TalkButton_MouseUp
 
-        ' MouseLeave uses EventArgs.
+        ' MouseLeave
         AddHandler talkButton.MouseLeave,
             AddressOf TalkButton_MouseLeave
 
@@ -215,13 +270,16 @@ Public Class MainForm
         sipStatusLabel.Text =
             "SIP: Starting..."
 
-        sipStatusLabel.AutoSize = True
+        sipStatusLabel.AutoSize =
+            True
 
         sipStatusLabel.Location =
             New Point(420, 115)
 
         sipStatusLabel.Font =
-            New Font("Segoe UI", 8)
+            New Font(
+                "Segoe UI",
+                8)
 
         sipStatusLabel.ForeColor =
             Color.DarkOrange
@@ -235,13 +293,25 @@ Public Class MainForm
         ' DOOR CONTROL LABEL
         ' --------------------------------------------------------
 
-        Dim doorLabel As New Label With {
-            .Text = "Door Control",
-            .AutoSize = True,
-            .Font = New Font("Segoe UI", 10, FontStyle.Bold),
-            .Location = New Point(30, 168),
-            .BackColor = Color.Transparent
-        }
+        Dim doorLabel As New Label()
+
+        doorLabel.Text =
+            "Door Control"
+
+        doorLabel.AutoSize =
+            True
+
+        doorLabel.Font =
+            New Font(
+                "Segoe UI",
+                10,
+                FontStyle.Bold)
+
+        doorLabel.Location =
+            New Point(30, 168)
+
+        doorLabel.BackColor =
+            Color.Transparent
 
         Controls.Add(doorLabel)
 
@@ -249,45 +319,57 @@ Public Class MainForm
         ' DOOR BUTTON NAMES
         ' --------------------------------------------------------
 
-        Dim names =
-            New String() {
-                "Door 1 - WH7",
-                "Door 2 - WH9",
-                "Door 3",
-                "Door 4 - WH4",
-                "Door 5 - WH5"
-            }
+        Dim names As String() = {
+            "Door 1 - WH7",
+            "Door 2 - WH9",
+            "Door 3",
+            "Door 4 - WH4",
+            "Door 5 - WH5"
+        }
 
         ' --------------------------------------------------------
         ' CREATE DOOR BUTTONS
         ' --------------------------------------------------------
 
-        For i = 0 To 4
+        For i As Integer = 0 To 4
 
-            Dim b As New Button With {
-                .Text = names(i),
-                .Name =
-                    "CommandButton" &
-                    (i + 1).ToString(),
-                .Size =
-                    New Size(150, 52),
-                .Location =
-                    New Point(
-                        30 + (i Mod 3) * 170,
-                        200 + (i \ 3) * 65),
-                .BackColor =
-                    Color.Red,
-                .ForeColor =
-                    Color.White,
-                .FlatStyle =
-                    FlatStyle.Flat,
-                .Font =
-                    New Font(
-                        "Segoe UI",
-                        9,
-                        FontStyle.Bold),
-                .Tag = i
-            }
+            Dim b As New Button()
+
+            b.Text =
+                names(i)
+
+            b.Name =
+                "CommandButton" &
+                (i + 1).ToString()
+
+            b.Size =
+                New Size(150, 52)
+
+            b.Location =
+                New Point(
+                    30 + (i Mod 3) * 170,
+                    200 + (i \ 3) * 65)
+
+            b.BackColor =
+                Color.Red
+
+            b.ForeColor =
+                Color.White
+
+            b.FlatStyle =
+                FlatStyle.Flat
+
+            b.Font =
+                New Font(
+                    "Segoe UI",
+                    9,
+                    FontStyle.Bold)
+
+            b.Tag =
+                i
+
+            b.FlatAppearance.BorderSize =
+                0
 
             ' ----------------------------------------------------
             ' DISABLE DOOR 3
@@ -295,22 +377,25 @@ Public Class MainForm
 
             If i = 2 Then
 
-                b.Enabled = False
+                b.Enabled =
+                    False
 
-                b.BackColor = Color.Gray
+                b.BackColor =
+                    Color.Gray
 
-                b.ForeColor = Color.White
+                b.ForeColor =
+                    Color.White
 
-                b.Text = "Door 3 - DISABLED"
+                b.Text =
+                    "Door 3 - DISABLED"
 
             End If
-
-            b.FlatAppearance.BorderSize = 0
 
             AddHandler b.Click,
                 AddressOf DoorButton_Click
 
-            doorButtons(i) = b
+            doorButtons(i) =
+                b
 
             Controls.Add(b)
 
@@ -323,7 +408,8 @@ Public Class MainForm
         statusLabel.Text =
             "Checking VLC..."
 
-        statusLabel.AutoSize = True
+        statusLabel.AutoSize =
+            True
 
         statusLabel.ForeColor =
             Color.DimGray
@@ -337,27 +423,29 @@ Public Class MainForm
         Controls.Add(statusLabel)
 
         ' --------------------------------------------------------
-        ' INFORMATION LABEL
+        ' INFORMATION
         ' --------------------------------------------------------
 
-        Dim info As New Label With {
+        Dim info As New Label()
 
-            .Text =
-                "Select a warehouse to open its live camera in VLC." &
-                Environment.NewLine &
-                "Press and hold TALK to speak through the Hikvision device.",
+        info.Text =
+            "Select a warehouse to open its live camera in VLC." &
+            Environment.NewLine &
+            "Press and hold TALK to speak through the Hikvision device."
 
-            .AutoSize = True,
+        info.AutoSize =
+            True
 
-            .Location =
-                New Point(520, 160),
+        info.Location =
+            New Point(520, 160)
 
-            .Font =
-                New Font("Segoe UI", 10),
+        info.Font =
+            New Font(
+                "Segoe UI",
+                10)
 
-            .BackColor =
-                Color.Transparent
-        }
+        info.BackColor =
+            Color.Transparent
 
         Controls.Add(info)
 
@@ -371,11 +459,13 @@ Public Class MainForm
         sender As Object,
         e As EventArgs)
 
-        vlcPath = FindVlcPath()
+        vlcPath =
+            FindVlcPath()
 
         If String.IsNullOrWhiteSpace(vlcPath) Then
 
-            warehouseCombo.Enabled = False
+            warehouseCombo.Enabled =
+                False
 
             statusLabel.Text =
                 "VLC NOT INSTALLED"
@@ -385,7 +475,8 @@ Public Class MainForm
 
         Else
 
-            warehouseCombo.Enabled = True
+            warehouseCombo.Enabled =
+                True
 
             statusLabel.Text =
                 "VLC Ready"
@@ -406,13 +497,12 @@ Public Class MainForm
 
     Private Function FindVlcPath() As String
 
-        Dim candidates =
-            New String() {
-                "C:\Program Files\VideoLAN\VLC\vlc.exe",
-                "C:\Program Files (x86)\VideoLAN\VLC\vlc.exe"
-            }
+        Dim candidates As String() = {
+            "C:\Program Files\VideoLAN\VLC\vlc.exe",
+            "C:\Program Files (x86)\VideoLAN\VLC\vlc.exe"
+        }
 
-        For Each p In candidates
+        For Each p As String In candidates
 
             If File.Exists(p) Then
 
@@ -422,7 +512,7 @@ Public Class MainForm
 
         Next
 
-        For Each view In
+        For Each view As RegistryView In
             New RegistryView() {
                 RegistryView.Registry64,
                 RegistryView.Registry32
@@ -430,18 +520,18 @@ Public Class MainForm
 
             Try
 
-                Using key =
+                Using key As RegistryKey =
                     RegistryKey.OpenBaseKey(
                         RegistryHive.LocalMachine,
                         view)
 
-                    Using subKey =
+                    Using subKey As RegistryKey =
                         key.OpenSubKey(
                             "SOFTWARE\VideoLAN\VLC")
 
                         If subKey IsNot Nothing Then
 
-                            Dim installDir =
+                            Dim installDir As String =
                                 TryCast(
                                     subKey.GetValue(
                                         "InstallDir"),
@@ -450,7 +540,7 @@ Public Class MainForm
                             If Not String.IsNullOrWhiteSpace(
                                 installDir) Then
 
-                                Dim exe =
+                                Dim exe As String =
                                     Path.Combine(
                                         installDir,
                                         "vlc.exe")
@@ -514,16 +604,19 @@ Public Class MainForm
 
         Try
 
-            Dim psi As New ProcessStartInfo With {
+            Dim psi As New ProcessStartInfo()
 
-                .FileName = vlcPath,
+            psi.FileName =
+                vlcPath
 
-                .Arguments =
-                    $"--width=640 --height=360 " &
-                    $"--aspect-ratio=16:9 ""{rtsp}""",
+            psi.Arguments =
+                "--width=640 " &
+                "--height=360 " &
+                "--aspect-ratio=16:9 " &
+                """" & rtsp & """"
 
-                .UseShellExecute = False
-            }
+            psi.UseShellExecute =
+                False
 
             Process.Start(psi)
 
@@ -549,15 +642,16 @@ Public Class MainForm
         sender As Object,
         e As EventArgs)
 
-        Dim button =
-            DirectCast(sender, Button)
+        Dim button As Button =
+            DirectCast(
+                sender,
+                Button)
 
         Dim index As Integer =
             CInt(button.Tag)
 
         ' --------------------------------------------------------
-        ' EXTRA PROTECTION:
-        ' NEVER allow Door 3 to execute.
+        ' EXTRA PROTECTION FOR DOOR 3
         ' --------------------------------------------------------
 
         If index = 2 Then
@@ -566,11 +660,12 @@ Public Class MainForm
 
         End If
 
-        button.Enabled = False
+        button.Enabled =
+            False
 
         Try
 
-            Dim ok =
+            Dim ok As Boolean =
                 Await OpenDoorAsync(
                     doorIps(index))
 
@@ -618,7 +713,8 @@ Public Class MainForm
 
         Finally
 
-            button.Enabled = True
+            button.Enabled =
+                True
 
         End Try
 
@@ -631,7 +727,7 @@ Public Class MainForm
     Private Async Function OpenDoorAsync(
         ip As String) As Task(Of Boolean)
 
-        Dim curl =
+        Dim curl As String =
             FindCurlPath()
 
         If String.IsNullOrWhiteSpace(curl) Then
@@ -641,32 +737,48 @@ Public Class MainForm
 
         End If
 
-        Dim url =
-            $"http://{ip}/ISAPI/AccessControl/RemoteControl/door/1"
+        Dim url As String =
+            "http://" &
+            ip &
+            "/ISAPI/AccessControl/RemoteControl/door/1"
 
-        Dim xml =
+        Dim xml As String =
             "<RemoteControlDoor><cmd>open</cmd></RemoteControlDoor>"
 
-        Dim psi As New ProcessStartInfo With {
+        Dim psi As New ProcessStartInfo()
 
-            .FileName = curl,
+        psi.FileName =
+            curl
 
-            .Arguments =
-                $"--digest -u ""{UserName}:{Password}"" " &
-                $"-H ""Content-Type: application/xml"" " &
-                $"-X PUT ""{url}"" " &
-                $"-d ""{xml}""",
+        psi.Arguments =
+            "--digest " &
+            "-u """ &
+            UserName &
+            ":" &
+            Password &
+            """ " &
+            "-H ""Content-Type: application/xml"" " &
+            "-X PUT " &
+            """" &
+            url &
+            """ " &
+            "-d """ &
+            xml &
+            """"
 
-            .UseShellExecute = False,
+        psi.UseShellExecute =
+            False
 
-            .CreateNoWindow = True,
+        psi.CreateNoWindow =
+            True
 
-            .RedirectStandardOutput = True,
+        psi.RedirectStandardOutput =
+            True
 
-            .RedirectStandardError = True
-        }
+        psi.RedirectStandardError =
+            True
 
-        Using p =
+        Using p As Process =
             Process.Start(psi)
 
             If p Is Nothing Then
@@ -689,7 +801,7 @@ Public Class MainForm
 
     Private Function FindCurlPath() As String
 
-        Dim systemCurl =
+        Dim systemCurl As String =
             Path.Combine(
                 Environment.SystemDirectory,
                 "curl.exe")
@@ -705,7 +817,7 @@ Public Class MainForm
     End Function
 
     ' ============================================================
-    ' TALK - MOUSE DOWN
+    ' TALK BUTTON - MOUSE DOWN
     ' ============================================================
 
     Private Async Sub TalkButton_MouseDown(
@@ -719,7 +831,7 @@ Public Class MainForm
         End If
 
         ' --------------------------------------------------------
-        ' CHECK HIKVISION SIP REGISTRATION
+        ' CHECK DEVICE REGISTRATION
         ' --------------------------------------------------------
 
         If Not sipService.IsDeviceRegistered() Then
@@ -731,19 +843,15 @@ Public Class MainForm
                 Color.Red
 
             MessageBox.Show(
-
                 "DS-K1T502DBFWX is not registered." &
                 Environment.NewLine &
                 Environment.NewLine &
-                "Configure the Hikvision device SIP/VoIP server " &
-                "IP address to this PC's IP address." &
+                "Set the Hikvision SIP/VoIP server IP " &
+                "to this PC's IP address." &
                 Environment.NewLine &
                 "SIP Server Port: 5060",
-
                 "TALK",
-
                 MessageBoxButtons.OK,
-
                 MessageBoxIcon.Warning)
 
             Return
@@ -751,7 +859,7 @@ Public Class MainForm
         End If
 
         ' --------------------------------------------------------
-        ' TALKING UI
+        ' TALKING STATUS
         ' --------------------------------------------------------
 
         talkButton.BackColor =
@@ -764,7 +872,7 @@ Public Class MainForm
             "TALKING..."
 
         sipStatusLabel.Text =
-            "SIP: Calling Door Device..."
+            "SIP: Calling Device..."
 
         sipStatusLabel.ForeColor =
             Color.Green
@@ -773,7 +881,7 @@ Public Class MainForm
         ' START TALK
         ' --------------------------------------------------------
 
-        Dim result =
+        Dim result As Boolean =
             Await sipService.TalkAsync()
 
         If result Then
@@ -809,41 +917,42 @@ Public Class MainForm
     End Sub
 
     ' ============================================================
-    ' TALK - MOUSE UP
+    ' TALK BUTTON - MOUSE UP
     ' ============================================================
 
     Private Sub TalkButton_MouseUp(
         sender As Object,
         e As MouseEventArgs)
 
-        sipService.StopTalk()
-
-        talkButton.BackColor =
-            Color.Red
-
-        talkButton.ForeColor =
-            Color.White
-
-        talkButton.Text =
-            "TALK"
-
-        sipStatusLabel.Text =
-            sipService.Status
-
-        sipStatusLabel.ForeColor =
-            Color.DarkOrange
+        StopTalking()
 
     End Sub
 
     ' ============================================================
-    ' TALK - MOUSE LEAVE
+    ' TALK BUTTON - MOUSE LEAVE
     ' ============================================================
 
     Private Sub TalkButton_MouseLeave(
         sender As Object,
         e As EventArgs)
 
-        sipService.StopTalk()
+        StopTalking()
+
+    End Sub
+
+    ' ============================================================
+    ' STOP TALKING
+    ' ============================================================
+
+    Private Sub StopTalking()
+
+        Try
+
+            sipService.StopTalk()
+
+        Catch
+
+        End Try
 
         talkButton.BackColor =
             Color.Red
